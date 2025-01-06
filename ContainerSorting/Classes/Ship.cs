@@ -9,7 +9,7 @@ namespace ContainerSorting.Classes
     public class Ship
     {
         private const double BalanceThreshold = 0.2; // 20%
-        private readonly List<Row> rows;
+        public List<Row> rows;
 
         public int Length { get; }
         public int Width { get; }
