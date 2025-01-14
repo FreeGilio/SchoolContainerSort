@@ -17,21 +17,54 @@ namespace ContainerSorting.Classes
         public Ship(int length, int width)
         {
             if (length <= 0 || width <= 0)
+            {
                 throw new ArgumentException("Invalid ship dimensions.");
+            }         
 
             Length = length;
             Width = width;
             rows = new List<Row>();
 
             for (int i = 0; i < Length; i++)
+            {
                 rows.Add(new Row(Width));
+            }
         }
 
         public bool LoadContainer(Container container)
         {
-            // If container is refrigerated, prioritize front row (first row)
-            Row targetRow = container.IsRefrigerated ? rows.First() : GetOptimalRowForContainer();
+            if (rows == null || rows.Count == 0)
+                throw new InvalidOperationException("Ship rows are not properly initialized.");
 
+            if (container.IsCoolable)
+            {
+                return AddToRow(container, rows[0]);
+            }
+
+            if (container.IsValuable)
+            {
+
+                if (AddToRow(container, rows[0])) return true;
+
+                if (AddToRow(container, rows[rows.Count - 1])) return true;
+
+                throw new InvalidOperationException("Could not place valuable container in accessible rows.");
+
+                return false;
+            }
+
+            Row targetRow = GetOptimalRowForContainer(container);
+            if (targetRow == null)
+            {
+                throw new InvalidOperationException("No valid row to place the container.");
+            }
+
+            return AddToRow(container, targetRow);
+        }
+
+
+        private bool AddToRow(Container container, Row targetRow)
+        {
             foreach (var stack in targetRow.Stacks)
             {
                 if (stack.CanAddContainer(container))
@@ -41,14 +74,18 @@ namespace ContainerSorting.Classes
                 }
             }
 
-            return false; 
+            return false;
         }
 
-        private Row GetOptimalRowForContainer()
+        private Row GetOptimalRowForContainer(Container container)
         {
-            // Find the row with the lightest weight to balance load
-            return rows.OrderBy(r => r.TotalWeight).First();
+            var validRows = rows.Where(row => row.Stacks.Any(stack => stack.CanAddContainer(container)));
+            if (!validRows.Any())
+                throw new InvalidOperationException("No available rows to place the container.");
+
+            return validRows.OrderBy(row => row.TotalWeight).First();
         }
+
 
         public void PrintShipLayout()
         {
@@ -58,11 +95,49 @@ namespace ContainerSorting.Classes
                 for (int j = 0; j < rows[i].Stacks.Count; j++)
                 {
                     Console.Write($"  Stack {j + 1}: ");
-                    var containers = rows[i].Stacks[j].Containers;
+                    var containers = rows[i].Stacks[j].Containers
+                        .OrderBy(c => c.IsValuable ? 1 : 0) 
+                        .ToList();
+
                     Console.WriteLine(string.Join(", ", containers.Select(c => c.ToString())));
                 }
             }
         }
+
+        public string SerializeToUrl()
+        {
+            var shipData = new StringBuilder();
+
+            // Add ship dimensions
+            shipData.Append($"?length={Length}&width={Width}");
+
+            // Serialize container types
+            shipData.Append("&stacks=");
+            var rowTypeData = rows.Select(row =>
+                string.Join(",", row.Stacks.Select(stack =>
+                    string.Join("-", stack.Containers
+                        .OrderBy(c => c.IsValuable ? 1 : 0) 
+                        .Select(c =>
+                            c.IsValuable && c.IsCoolable ? "4" :
+                            c.IsValuable ? "2" :
+                            c.IsCoolable ? "3" : "1"
+                        )))));
+            shipData.Append(string.Join("/", rowTypeData));
+
+            // Serialize container weights
+            shipData.Append("&weights=");
+            var rowWeightData = rows.Select(row =>
+                string.Join(",", row.Stacks.Select(stack =>
+                    string.Join("-", stack.Containers
+                        .OrderBy(c => c.IsValuable ? 1 : 0) 
+                        .Select(c => c.Weight / 1000)) 
+                )));
+            shipData.Append(string.Join("/", rowWeightData));
+
+            return shipData.ToString();
+        }
+
+
     }
 
 }

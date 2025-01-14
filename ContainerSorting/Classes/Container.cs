@@ -11,7 +11,7 @@ namespace ContainerSorting.Classes
         {
             Standard,
             Valuable,
-            Refrigerated
+            Coolable
         }
 
         public class Container
@@ -19,15 +19,17 @@ namespace ContainerSorting.Classes
             public int Weight { get; }
             public ContainerType Type { get; }
             public bool IsValuable => Type == ContainerType.Valuable;
-            public bool IsRefrigerated => Type == ContainerType.Refrigerated;
+            public bool IsCoolable => Type == ContainerType.Coolable;
+            public int MaxWeight = 30000;
+            
 
             public Container(int weight, ContainerType type)
             {
                 Weight = weight;
                 Type = type;
 
-                if (type != ContainerType.Standard && weight > 30000)
-                    throw new ContainerExceedsWeightLimitException("Weight cannot exceed 30 tons for valuable/refrigerated containers.");
+                if (type != ContainerType.Standard && weight > MaxWeight)
+                    throw new ContainerExceedsWeightLimitException("Weight cannot exceed 30 tons for valuable/Coolable containers.");
             }
 
             public override string ToString()

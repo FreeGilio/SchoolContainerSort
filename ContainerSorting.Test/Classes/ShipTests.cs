@@ -40,7 +40,7 @@ namespace ContainerSorting.Test.Classes
         {
             // Arrange
             var ship = new Ship(3, 2);
-            var refrigeratedContainer = new Container(20000, ContainerType.Refrigerated);
+            var refrigeratedContainer = new Container(20000, ContainerType.Coolable);
 
             // Act
             var result = ship.LoadContainer(refrigeratedContainer);

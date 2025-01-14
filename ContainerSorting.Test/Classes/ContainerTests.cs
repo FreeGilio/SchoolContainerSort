@@ -20,19 +20,19 @@ namespace ContainerSorting.Test.Classes
             Assert.Equal(25000, container.Weight);
             Assert.Equal(ContainerType.Standard, container.Type);
             Assert.False(container.IsValuable);
-            Assert.False(container.IsRefrigerated);
+            Assert.False(container.IsCoolable);
         }
 
         [Fact]
         public void CreateRefrigeratedContainer_ValidWeight_ShouldSucceed()
         {
             // Arrange & Act
-            var container = new Container(29000, ContainerType.Refrigerated);
+            var container = new Container(29000, ContainerType.Coolable);
 
             // Assert
             Assert.Equal(29000, container.Weight);
-            Assert.Equal(ContainerType.Refrigerated, container.Type);
-            Assert.True(container.IsRefrigerated);
+            Assert.Equal(ContainerType.Coolable, container.Type);
+            Assert.True(container.IsCoolable);
             Assert.False(container.IsValuable);
         }
 
@@ -46,17 +46,17 @@ namespace ContainerSorting.Test.Classes
             Assert.Equal(29000, container.Weight);
             Assert.Equal(ContainerType.Valuable, container.Type);
             Assert.True(container.IsValuable);
-            Assert.False(container.IsRefrigerated);
+            Assert.False(container.IsCoolable);
         }
 
         [Theory]
-        [InlineData(31000, ContainerType.Refrigerated)]
+        [InlineData(31000, ContainerType.Coolable)]
         [InlineData(35000, ContainerType.Valuable)]
         public void CreateSpecialContainer_ExceedsWeight_ShouldThrowException(int weight, ContainerType type)
         {
             // Act & Assert
             var exception = Assert.Throws<ContainerExceedsWeightLimitException>(() => new Container(weight, type));
-            Assert.Equal("Weight cannot exceed 30 tons for valuable/refrigerated containers.", exception.Message);
+            Assert.Equal("Weight cannot exceed 30 tons for valuable/Coolable containers.", exception.Message);
         }
 
         [Fact]

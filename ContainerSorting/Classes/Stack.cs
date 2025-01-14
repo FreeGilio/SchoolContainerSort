@@ -21,21 +21,34 @@ namespace ContainerSorting.Classes
 
         public bool CanAddContainer(Container container)
         {
-            if (containers.Any() && containers.Last().IsValuable)
-                return false;
-
-            if (container.IsValuable && containers.Any())
-                return false;
-
-            if (WeightOnTop() + container.Weight > MaxWeightAboveContainer)
+            if (container == null)
                 return false; 
 
-            return true;
+            if (container.IsValuable)
+            {
+                return !containers.Any(c => c.IsValuable);
+            }
+
+            if (container.IsCoolable && !IsFirstRowStack)
+            {
+                return false; 
+            }
+
+            if (WeightOnTop() + container.Weight > MaxWeightAboveContainer)
+            {
+                return false; 
+            }
+
+            return true; 
         }
 
+
+        private bool IsFirstRowStack => containers.Count == 0 || containers.First().IsCoolable;
+
+
         private int WeightOnTop()
-        {
-            return containers.Sum(c => c.Weight);
+        {            
+            return containers.Skip(1).Sum(c => c.Weight);
         }
 
         public void AddContainer(Container container)

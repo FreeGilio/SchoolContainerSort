@@ -12,10 +12,16 @@ Ship ship = new Ship(length, width);
 
 List<Container> containersToLoad = new List<Container>
             {
-                new Container(30000, ContainerType.Refrigerated),
-                new Container(30000, ContainerType.Valuable),
-                new Container(4000, ContainerType.Standard),
+                new Container(30000, ContainerType.Coolable),              
+                new Container(10000, ContainerType.Coolable),
+                new Container(10000, ContainerType.Coolable),
+                new Container(10000, ContainerType.Standard),
+                new Container(10000, ContainerType.Standard),
+                new Container(10000, ContainerType.Valuable),
+                new Container(10000, ContainerType.Valuable),
+                new Container(10000, ContainerType.Standard),
                 new Container(28000, ContainerType.Standard),
+                new Container(30000, ContainerType.Valuable),
                 new Container(4000, ContainerType.Valuable),
             };
 
@@ -27,3 +33,7 @@ foreach (var container in containersToLoad)
 
 Console.WriteLine("\nFinal ship layout:");
 ship.PrintShipLayout();
+string url = ship.SerializeToUrl();
+
+Console.WriteLine("\nShip Syntax:\n" + url);
+// ship.SaveLayoutToJson("ShipLayout.json");
